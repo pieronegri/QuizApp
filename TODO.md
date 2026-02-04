@@ -58,3 +58,4 @@ Note rapide per sviluppo locale con `clasp` (opzionale)
 ---
 
 Vuoi che generi ora i file `Code.gs` e `Index.html` con il codice base da incollare nel progetto Apps Script?
+

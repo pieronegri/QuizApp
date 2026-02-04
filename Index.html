@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+    }
+    
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .user-info {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+      min-height: 20px; /* Previene shift durante caricamento */
+    }
+    
+    .filters {
+      display: grid;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    select {
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      background: white;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    select:disabled {
+      background: #f5f5f5;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    /* Skeleton loading per dropdown */
+    select.loading {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      color: transparent;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+    
+    button:hover:not(:disabled) {
+      background: #5568d3;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .question-container {
+      margin-top: 30px;
+      padding: 25px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      display: none;
+    }
+    
+    .question-container.show {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .question-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .badge {
+      padding: 6px 12px;
+      background: #667eea;
+      color: white;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .question-text {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .answer {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      margin-top: 15px;
+      display: none;
+    }
+    
+    .answer.show {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .answer-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .answer-text {
+      color: #555;
+      line-height: 1.6;
+    }
+    
+    .loading {
+      text-align: center;
+      color: #667eea;
+      margin-top: 20px;
+    }
+    
+    .info-banner {
+      background: #e8eaf6;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+    
+    .info-banner strong {
+      color: #667eea;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .button-group button {
+      flex: 1;
+      margin-top: 0;
+    }
+    
+    .button-secondary {
+      background: #764ba2;
+      padding: 12px;
+      font-size: 14px;
+    }
+    
+    .button-secondary:hover:not(:disabled) {
+      background: #63397a;
+    }
+    
+    .info-banner {
+      background: #e8eaf6;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+    
+    .info-banner strong {
+      color: #667eea;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .button-group button {
+      flex: 1;
+      margin-top: 0;
+    }
+    
+    .button-secondary {
+      background: #764ba2;
+      padding: 12px;
+      font-size: 14px;
+    }
+    
+    .button-secondary:hover:not(:disabled) {
+      background: #63397a;
+    }
+    
+    .footer-signature {
+      position: relative;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      text-align: right;
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .footer-signature p {
+      margin: 4px 0;
+    }
+    
+    /* Responsive Design per Mobile */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 25px;
+        border-radius: 15px;
+      }
+      
+      h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      
+      .user-info {
+        font-size: 13px;
+      }
+      
+      select {
+        padding: 14px;
+        font-size: 16px; /* Previene zoom su iOS */
+      }
+      
+      button {
+        padding: 16px;
+        font-size: 16px;
+      }
+      
+      .question-text {
+        font-size: 16px;
+      }
+      
+      .badge {
+        font-size: 12px;
+        padding: 8px 14px;
+      }
+      
+      .answer {
+        padding: 18px;
+        font-size: 15px;
+      }
+      
+      .answer-text {
+        font-size: 14px;
+      }
+      
+      .footer-signature {
+        font-size: 10px;
+        margin-top: 20px;
+        padding-top: 15px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 22px;
+      }
+      
+      .question-header {
+        gap: 8px;
+      }
+      
+      .badge {
+        font-size: 11px;
+        padding: 6px 12px;
+      }
+      
+      .question-text {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Casuale</h1>
+    <div class="user-info" id="userInfo">Caricamento...</div>
+    
+    <div class="info-banner">
+      <strong>Come funziona:</strong> Seleziona materia e argomento, poi estrai una domanda casuale dalla banca dati. 
+      Verifica la tua preparazione e confronta la tua risposta con quella preparata dal docente.
+    </div>
+    
+    <div class="filters">
+      <select id="materiaSelect" class="loading" disabled>
+        <option value="">Caricamento materie...</option>
+      </select>
+      
+      <select id="argomentoSelect" class="loading" disabled>
+        <option value="">Seleziona prima una materia</option>
+      </select>
+    </div>
+    
+    <button id="getQuestionBtn" disabled>Estrai Domanda</button>
+    
+    <div class="question-container" id="questionContainer">
+      <div class="question-header">
+        <span class="badge" id="materiaBadge"></span>
+        <span class="badge" id="argomentoBadge"></span>
+      </div>
+      <div class="question-text" id="questionText"></div>
+      <div class="button-group">
+        <button id="showanswerBtn">Mostra Risposta</button>
+        <button id="loadAnotherBtn" class="button-secondary">Carica un'altra</button>
+      </div>
+      <div class="answer" id="answer">
+        <div class="answer-title">Risposta del docente:</div>
+        <div class="answer-text" id="answerText"></div>
+      </div>
+    </div>
+    
+    <div class="loading" id="loading" style="display: none;">
+      Caricamento...
+    </div>
+    
+    <div class="footer-signature">
+      <p>Produly powered by prof. Negri</p>
+      <p>&copy; 2026 Quiz App. All rights reserved.</p>
+    </div>
+  </div>
+
+  <script>
+    let currentQuestion = null;
+    let materiaArgomentiMap = {}; // Mappa materia -> argomenti
+    
+    // Carica filtri e user info
+    window.addEventListener('load', () => {
+      google.script.run
+        .withSuccessHandler(displayUserEmail)
+        .getUserEmail();
+        
+      google.script.run
+        .withSuccessHandler(populateFilters)
+        .withFailureHandler(showError)
+        .getFilterOptions();
+    });
+    
+    function displayUserEmail(email) {
+      document.getElementById('userInfo').textContent = `Connesso come: ${email}`;
+    }
+    
+    function populateFilters(options) {
+      const materiaSelect = document.getElementById('materiaSelect');
+      const argomentoSelect = document.getElementById('argomentoSelect');
+      const getQuestionBtn = document.getElementById('getQuestionBtn');
+      
+      // Salva la mappa
+      materiaArgomentiMap = options.materiaArgomentiMap;
+      
+      // Rimuovi loading state
+      materiaSelect.classList.remove('loading');
+      materiaSelect.disabled = false;
+      materiaSelect.innerHTML = '<option value="">Tutte le materie</option>';
+      
+      // Popola materie
+      options.materie.forEach(materia => {
+        const option = document.createElement('option');
+        option.value = materia;
+        option.textContent = materia;
+        materiaSelect.appendChild(option);
+      });
+      
+      // Resetta argomenti
+      argomentoSelect.classList.remove('loading');
+      argomentoSelect.disabled = false;
+      argomentoSelect.innerHTML = '<option value="">Tutti gli argomenti</option>';
+      
+      // Abilita bottone
+      getQuestionBtn.disabled = false;
+      
+      // Event listener per materia change
+      materiaSelect.addEventListener('change', updateArgomenti);
+    }
+    
+    function updateArgomenti() {
+      const materiaSelect = document.getElementById('materiaSelect');
+      const argomentoSelect = document.getElementById('argomentoSelect');
+      const selectedMateria = materiaSelect.value;
+      
+      // Reset argomenti
+      argomentoSelect.innerHTML = '<option value="">Tutti gli argomenti</option>';
+      
+      if (!selectedMateria) {
+        // Se nessuna materia selezionata, mostra tutti gli argomenti
+        const tuttiArgomenti = new Set();
+        Object.values(materiaArgomentiMap).forEach(args => {
+          args.forEach(arg => tuttiArgomenti.add(arg));
+        });
+        
+        [...tuttiArgomenti].sort().forEach(argomento => {
+          const option = document.createElement('option');
+          option.value = argomento;
+          option.textContent = argomento;
+          argomentoSelect.appendChild(option);
+        });
+      } else {
+        // Mostra solo argomenti della materia selezionata
+        const argomenti = materiaArgomentiMap[selectedMateria] || [];
+        
+        argomenti.forEach(argomento => {
+          const option = document.createElement('option');
+          option.value = argomento;
+          option.textContent = argomento;
+          argomentoSelect.appendChild(option);
+        });
+      }
+    }
+    
+    // Estrai domanda
+    function fetchRandomQuestion() {
+      const materia = document.getElementById('materiaSelect').value;
+      const argomento = document.getElementById('argomentoSelect').value;
+      
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('questionContainer').classList.remove('show');
+      document.getElementById('getQuestionBtn').disabled = true;
+      document.getElementById('loadAnotherBtn').disabled = true;
+      
+      google.script.run
+        .withSuccessHandler(displayQuestion)
+        .withFailureHandler(showError)
+        .getRandomQuestion(materia, argomento);
+    }
+    
+    document.getElementById('getQuestionBtn').addEventListener('click', fetchRandomQuestion);
+    document.getElementById('loadAnotherBtn').addEventListener('click', fetchRandomQuestion);
+    
+    function displayQuestion(question) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('getQuestionBtn').disabled = false;
+      document.getElementById('loadAnotherBtn').disabled = false;
+      
+      if (!question) {
+        alert('Nessuna domanda trovata con questi filtri');
+        return;
+      }
+      
+      currentQuestion = question;
+      
+      document.getElementById('materiaBadge').textContent = question.materia;
+      document.getElementById('argomentoBadge').textContent = question.argomento;
+      document.getElementById('questionText').textContent = question.domanda;
+      document.getElementById('answerText').textContent = question.feedback;
+      
+      document.getElementById('questionContainer').classList.add('show');
+      document.getElementById('answer').classList.remove('show');
+    }
+    
+    // Mostra answer
+    document.getElementById('showanswerBtn').addEventListener('click', () => {
+      document.getElementById('answer').classList.add('show');
+    });
+    
+    function showError(error) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('getQuestionBtn').disabled = false;
+      alert('Errore: ' + error.message);
+    }
+  </script>
+</body>
+</html>
